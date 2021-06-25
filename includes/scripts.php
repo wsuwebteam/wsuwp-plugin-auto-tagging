@@ -10,11 +10,11 @@ class Scripts {
         $editor_asset = include( Plugin::get('plugin_dir') . 'assets/dist/index.asset.php');
 
         wp_enqueue_script(
-			'wsuwp-plugin-auto-tagging-scripts',
-			Plugin::get('plugin_url') . 'assets/dist/index.js',
-			$editor_asset['dependencies'],
-			$editor_asset['version']
-		);
+            'wsuwp-plugin-auto-tagging-scripts',
+            Plugin::get('plugin_url') . 'assets/dist/index.js',
+            $editor_asset['dependencies'],
+            $editor_asset['version']
+        );
 
         wp_enqueue_style(
             'wsuwp-plugin-auto-tagging-styles',

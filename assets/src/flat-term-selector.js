@@ -5,15 +5,15 @@
  * External dependencies
  */
  import {
-	escape as escapeString,
-	find,
-	get,
-	invoke,
-	isEmpty,
-	map,
-	throttle,
-	unescape as lodashUnescapeString,
-	uniqBy,
+    escape as escapeString,
+    find,
+    get,
+    invoke,
+    isEmpty,
+    map,
+    throttle,
+    unescape as lodashUnescapeString,
+    uniqBy,
 } from 'lodash';
 
 /**
@@ -32,19 +32,19 @@ import { addQueryArgs } from '@wordpress/url';
  */
 const MAX_TERMS_SUGGESTIONS = 20;
 const DEFAULT_QUERY = {
-	per_page: MAX_TERMS_SUGGESTIONS,
-	orderby: 'count',
-	order: 'desc',
-	_fields: 'id,name',
+    per_page: MAX_TERMS_SUGGESTIONS,
+    orderby: 'count',
+    order: 'desc',
+    _fields: 'id,name',
 };
 
 // Lodash unescape function handles &#39; but not &#039; which may be return in some API requests.
 const unescapeString = ( arg ) => {
-	return lodashUnescapeString( arg.replace( '&#039;', "'" ) );
+    return lodashUnescapeString( arg.replace( '&#039;', "'" ) );
 };
 const isSameTermName = ( termA, termB ) =>
-	unescapeString( termA ).toLowerCase() ===
-	unescapeString( termB ).toLowerCase();
+    unescapeString( termA ).toLowerCase() ===
+    unescapeString( termB ).toLowerCase();
 
 /**
  * Returns a term object with name unescaped.
@@ -55,10 +55,10 @@ const isSameTermName = ( termA, termB ) =>
  * @return {Object} Term object with name property unescaped.
  */
 const unescapeTerm = ( term ) => {
-	return {
-		...term,
-		name: unescapeString( term.name ),
-	};
+    return {
+        ...term,
+        name: unescapeString( term.name ),
+    };
 };
 
 /**
@@ -70,174 +70,174 @@ const unescapeTerm = ( term ) => {
  * @return {Object[]} Array of term objects unescaped.
  */
 const unescapeTerms = ( terms ) => {
-	return map( terms, unescapeTerm );
+    return map( terms, unescapeTerm );
 };
 
 class WSUFlatTermSelector extends Component {
-	constructor() {
-		super( ...arguments );
-		this.onChange = this.onChange.bind( this );
-		this.searchTerms = throttle( this.searchTerms.bind( this ), 500 );
-		this.findOrCreateTerm = this.findOrCreateTerm.bind( this );
-		this.autofillTags = this.autofillTags.bind( this );
-		this.state = {
-			loading: ! isEmpty( this.props.terms ),
-			availableTerms: [],
-			selectedTerms: [],
+    constructor() {
+        super( ...arguments );
+        this.onChange = this.onChange.bind( this );
+        this.searchTerms = throttle( this.searchTerms.bind( this ), 500 );
+        this.findOrCreateTerm = this.findOrCreateTerm.bind( this );
+        this.autofillTags = this.autofillTags.bind( this );
+        this.state = {
+            loading: ! isEmpty( this.props.terms ),
+            availableTerms: [],
+            selectedTerms: [],
             allTerms: [],
-		};
-	}
+        };
+    }
 
-	componentDidMount() {
-		if ( ! isEmpty( this.props.terms ) ) {
-			this.initRequest = this.fetchTerms( {
-				include: this.props.terms.join( ',' ),
-				per_page: -1,
-			} );
-			this.initRequest.then(
-				() => {
-					this.setState( { loading: false } );
-				},
-				( xhr ) => {
-					if ( xhr.statusText === 'abort' ) {
-						return;
-					}
-					this.setState( {
-						loading: false,
-					} );
-				}
-			);
-		}
-	}
+    componentDidMount() {
+        if ( ! isEmpty( this.props.terms ) ) {
+            this.initRequest = this.fetchTerms( {
+                include: this.props.terms.join( ',' ),
+                per_page: -1,
+            } );
+            this.initRequest.then(
+                () => {
+                    this.setState( { loading: false } );
+                },
+                ( xhr ) => {
+                    if ( xhr.statusText === 'abort' ) {
+                        return;
+                    }
+                    this.setState( {
+                        loading: false,
+                    } );
+                }
+            );
+        }
+    }
 
-	componentWillUnmount() {
-		invoke( this.initRequest, [ 'abort' ] );
-		invoke( this.searchRequest, [ 'abort' ] );
-		invoke( this.allTermsRequest, [ 'abort' ] );
-	}
+    componentWillUnmount() {
+        invoke( this.initRequest, [ 'abort' ] );
+        invoke( this.searchRequest, [ 'abort' ] );
+        invoke( this.allTermsRequest, [ 'abort' ] );
+    }
 
-	componentDidUpdate( prevProps ) {
-		if ( prevProps.terms !== this.props.terms ) {
-			this.updateSelectedTerms( this.props.terms );
-		}
-	}
+    componentDidUpdate( prevProps ) {
+        if ( prevProps.terms !== this.props.terms ) {
+            this.updateSelectedTerms( this.props.terms );
+        }
+    }
 
-	fetchTerms( params = {} ) {
-		const { taxonomy } = this.props;
-		const query = { ...DEFAULT_QUERY, ...params };
+    fetchTerms( params = {} ) {
+        const { taxonomy } = this.props;
+        const query = { ...DEFAULT_QUERY, ...params };
 
-		const request = apiFetch( {
-			path: addQueryArgs( `/wp/v2/${ taxonomy.rest_base }`, query ),
-		} );
-		request.then( unescapeTerms ).then( ( terms ) => {
-			this.setState( ( state ) => ( {
-				availableTerms: state.availableTerms.concat(
-					terms.filter(
-						( term ) =>
-							! find(
-								state.availableTerms,
-								( availableTerm ) =>
-									availableTerm.id === term.id
-							)
-					)
-				),
-			} ) );
-			this.updateSelectedTerms( this.props.terms );
-		} );
+        const request = apiFetch( {
+            path: addQueryArgs( `/wp/v2/${ taxonomy.rest_base }`, query ),
+        } );
+        request.then( unescapeTerms ).then( ( terms ) => {
+            this.setState( ( state ) => ( {
+                availableTerms: state.availableTerms.concat(
+                    terms.filter(
+                        ( term ) =>
+                            ! find(
+                                state.availableTerms,
+                                ( availableTerm ) =>
+                                    availableTerm.id === term.id
+                            )
+                    )
+                ),
+            } ) );
+            this.updateSelectedTerms( this.props.terms );
+        } );
 
-		return request;
-	}
+        return request;
+    }
 
-	updateSelectedTerms( terms = [] ) {
-		const selectedTerms = terms.reduce( ( accumulator, termId ) => {
-			const termObject = find(
-				this.state.availableTerms,
-				( term ) => term.id === termId
-			);
-			if ( termObject ) {
-				accumulator.push( termObject.name );
-			}
+    updateSelectedTerms( terms = [] ) {
+        const selectedTerms = terms.reduce( ( accumulator, termId ) => {
+            const termObject = find(
+                this.state.availableTerms,
+                ( term ) => term.id === termId
+            );
+            if ( termObject ) {
+                accumulator.push( termObject.name );
+            }
 
-			return accumulator;
-		}, [] );
-		this.setState( {
-			selectedTerms,
-		} );
-	}
+            return accumulator;
+        }, [] );
+        this.setState( {
+            selectedTerms,
+        } );
+    }
 
-	findOrCreateTerm( termName ) {
-		const { taxonomy } = this.props;
-		const termNameEscaped = escapeString( termName );
-		// Tries to create a term or fetch it if it already exists.
-		return apiFetch( {
-			path: `/wp/v2/${ taxonomy.rest_base }`,
-			method: 'POST',
-			data: { name: termNameEscaped },
-		} )
-			.catch( ( error ) => {
-				const errorCode = error.code;
-				if ( errorCode === 'term_exists' ) {
-					// If the terms exist, fetch it instead of creating a new one.
-					this.addRequest = apiFetch( {
-						path: addQueryArgs( `/wp/v2/${ taxonomy.rest_base }`, {
-							...DEFAULT_QUERY,
-							search: termNameEscaped,
-						} ),
-					} ).then( unescapeTerms );
-					return this.addRequest.then( ( searchResult ) => {
-						return find( searchResult, ( result ) =>
-							isSameTermName( result.name, termName )
-						);
-					} );
-				}
-				return Promise.reject( error );
-			} )
-			.then( unescapeTerm );
-	}
+    findOrCreateTerm( termName ) {
+        const { taxonomy } = this.props;
+        const termNameEscaped = escapeString( termName );
+        // Tries to create a term or fetch it if it already exists.
+        return apiFetch( {
+            path: `/wp/v2/${ taxonomy.rest_base }`,
+            method: 'POST',
+            data: { name: termNameEscaped },
+        } )
+            .catch( ( error ) => {
+                const errorCode = error.code;
+                if ( errorCode === 'term_exists' ) {
+                    // If the terms exist, fetch it instead of creating a new one.
+                    this.addRequest = apiFetch( {
+                        path: addQueryArgs( `/wp/v2/${ taxonomy.rest_base }`, {
+                            ...DEFAULT_QUERY,
+                            search: termNameEscaped,
+                        } ),
+                    } ).then( unescapeTerms );
+                    return this.addRequest.then( ( searchResult ) => {
+                        return find( searchResult, ( result ) =>
+                            isSameTermName( result.name, termName )
+                        );
+                    } );
+                }
+                return Promise.reject( error );
+            } )
+            .then( unescapeTerm );
+    }
 
-	onChange( termNames ) {
-		const uniqueTerms = uniqBy( termNames, ( term ) => term.toLowerCase() );
-		this.setState( { selectedTerms: uniqueTerms } );
-		const newTermNames = uniqueTerms.filter(
-			( termName ) =>
-				! find( this.state.availableTerms, ( term ) =>
-					isSameTermName( term.name, termName )
-				)
-		);
-		const termNamesToIds = ( names, availableTerms ) => {
-			return names.map(
-				( termName ) =>
-					find( availableTerms, ( term ) =>
-						isSameTermName( term.name, termName )
-					).id
-			);
-		};
-		if ( newTermNames.length === 0 ) {
-			return this.props.onUpdateTerms(
-				termNamesToIds( uniqueTerms, this.state.availableTerms ),
-				this.props.taxonomy.rest_base
-			);
-		}
-		Promise.all( newTermNames.map( this.findOrCreateTerm ) ).then(
-			( newTerms ) => {
-				const newAvailableTerms = this.state.availableTerms.concat(
-					newTerms
-				);
-				this.setState( { availableTerms: newAvailableTerms } );
-				return this.props.onUpdateTerms(
-					termNamesToIds( uniqueTerms, newAvailableTerms ),
-					this.props.taxonomy.rest_base
-				);
-			}
-		);
-	}
+    onChange( termNames ) {
+        const uniqueTerms = uniqBy( termNames, ( term ) => term.toLowerCase() );
+        this.setState( { selectedTerms: uniqueTerms } );
+        const newTermNames = uniqueTerms.filter(
+            ( termName ) =>
+                ! find( this.state.availableTerms, ( term ) =>
+                    isSameTermName( term.name, termName )
+                )
+        );
+        const termNamesToIds = ( names, availableTerms ) => {
+            return names.map(
+                ( termName ) =>
+                    find( availableTerms, ( term ) =>
+                        isSameTermName( term.name, termName )
+                    ).id
+            );
+        };
+        if ( newTermNames.length === 0 ) {
+            return this.props.onUpdateTerms(
+                termNamesToIds( uniqueTerms, this.state.availableTerms ),
+                this.props.taxonomy.rest_base
+            );
+        }
+        Promise.all( newTermNames.map( this.findOrCreateTerm ) ).then(
+            ( newTerms ) => {
+                const newAvailableTerms = this.state.availableTerms.concat(
+                    newTerms
+                );
+                this.setState( { availableTerms: newAvailableTerms } );
+                return this.props.onUpdateTerms(
+                    termNamesToIds( uniqueTerms, newAvailableTerms ),
+                    this.props.taxonomy.rest_base
+                );
+            }
+        );
+    }
 
-	searchTerms( search = '' ) {
-		invoke( this.searchRequest, [ 'abort' ] );
-		if ( search.length >= 3 ) {
-			this.searchRequest = this.fetchTerms( { search } );
-		}
-	}
+    searchTerms( search = '' ) {
+        invoke( this.searchRequest, [ 'abort' ] );
+        if ( search.length >= 3 ) {
+            this.searchRequest = this.fetchTerms( { search } );
+        }
+    }
 
     getAllTerms(){
         return new Promise((resolve, reject) => {
@@ -282,99 +282,99 @@ class WSUFlatTermSelector extends Component {
         });
     }
 
-	render() {
-		const { slug, taxonomy, hasAssignAction } = this.props;
+    render() {
+        const { slug, taxonomy, hasAssignAction } = this.props;
 
-		if ( ! hasAssignAction ) {
-			return null;
-		}
+        if ( ! hasAssignAction ) {
+            return null;
+        }
 
-		const { loading, availableTerms, selectedTerms } = this.state;
-		const termNames = availableTerms.map( ( term ) => term.name );
+        const { loading, availableTerms, selectedTerms } = this.state;
+        const termNames = availableTerms.map( ( term ) => term.name );
 
-		const newTermLabel = get(
-			taxonomy,
-			[ 'labels', 'add_new_item' ],
-			slug === 'post_tag' ? __( 'Add new tag' ) : __( 'Add new Term' )
-		);
-		const singularName = get(
-			taxonomy,
-			[ 'labels', 'singular_name' ],
-			slug === 'post_tag' ? __( 'Tag' ) : __( 'Term' )
-		);
-		const termAddedLabel = sprintf(
-			/* translators: %s: term name. */
-			_x( '%s added', 'term' ),
-			singularName
-		);
-		const termRemovedLabel = sprintf(
-			/* translators: %s: term name. */
-			_x( '%s removed', 'term' ),
-			singularName
-		);
-		const removeTermLabel = sprintf(
-			/* translators: %s: term name. */
-			_x( 'Remove %s', 'term' ),
-			singularName
-		);
+        const newTermLabel = get(
+            taxonomy,
+            [ 'labels', 'add_new_item' ],
+            slug === 'post_tag' ? __( 'Add new tag' ) : __( 'Add new Term' )
+        );
+        const singularName = get(
+            taxonomy,
+            [ 'labels', 'singular_name' ],
+            slug === 'post_tag' ? __( 'Tag' ) : __( 'Term' )
+        );
+        const termAddedLabel = sprintf(
+            /* translators: %s: term name. */
+            _x( '%s added', 'term' ),
+            singularName
+        );
+        const termRemovedLabel = sprintf(
+            /* translators: %s: term name. */
+            _x( '%s removed', 'term' ),
+            singularName
+        );
+        const removeTermLabel = sprintf(
+            /* translators: %s: term name. */
+            _x( 'Remove %s', 'term' ),
+            singularName
+        );
 
-		return [
-			<FormTokenField
-				value={ selectedTerms }
-				suggestions={ termNames }
-				onChange={ this.onChange }
-				onInputChange={ this.searchTerms }
-				maxSuggestions={ MAX_TERMS_SUGGESTIONS }
-				disabled={ loading }
-				label={ newTermLabel }
-				messages={ {
-					added: termAddedLabel,
-					removed: termRemovedLabel,
-					remove: removeTermLabel,
-				} }
-			/>,
+        return [
+            <FormTokenField
+                value={ selectedTerms }
+                suggestions={ termNames }
+                onChange={ this.onChange }
+                onInputChange={ this.searchTerms }
+                maxSuggestions={ MAX_TERMS_SUGGESTIONS }
+                disabled={ loading }
+                label={ newTermLabel }
+                messages={ {
+                    added: termAddedLabel,
+                    removed: termRemovedLabel,
+                    remove: removeTermLabel,
+                } }
+            />,
             <Button
                 isSmall="true"
                 isPrimary="true"
                 variant="primary"
                 onClick={this.autofillTags}>Autofill Tags</Button>
         ];
-	}
+    }
 }
 
 export default compose(
-	withSelect( ( select, { slug } ) => {
-		const { getCurrentPost } = select( 'core/editor' );
-		const { getTaxonomy } = select( 'core' );
-		const taxonomy = getTaxonomy( slug );
-		return {
-			hasCreateAction: taxonomy
-				? get(
-						getCurrentPost(),
-						[ '_links', 'wp:action-create-' + taxonomy.rest_base ],
-						false
-				  )
-				: false,
-			hasAssignAction: taxonomy
-				? get(
-						getCurrentPost(),
-						[ '_links', 'wp:action-assign-' + taxonomy.rest_base ],
-						false
-				  )
-				: false,
-			terms: taxonomy
-				? select( 'core/editor' ).getEditedPostAttribute(
-						taxonomy.rest_base
-				  )
-				: [],
-			taxonomy,
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		return {
-			onUpdateTerms( terms, restBase ) {
-				dispatch( 'core/editor' ).editPost( { [ restBase ]: terms } );
-			},
-		};
-	} )
+    withSelect( ( select, { slug } ) => {
+        const { getCurrentPost } = select( 'core/editor' );
+        const { getTaxonomy } = select( 'core' );
+        const taxonomy = getTaxonomy( slug );
+        return {
+            hasCreateAction: taxonomy
+                ? get(
+                        getCurrentPost(),
+                        [ '_links', 'wp:action-create-' + taxonomy.rest_base ],
+                        false
+                  )
+                : false,
+            hasAssignAction: taxonomy
+                ? get(
+                        getCurrentPost(),
+                        [ '_links', 'wp:action-assign-' + taxonomy.rest_base ],
+                        false
+                  )
+                : false,
+            terms: taxonomy
+                ? select( 'core/editor' ).getEditedPostAttribute(
+                        taxonomy.rest_base
+                  )
+                : [],
+            taxonomy,
+        };
+    } ),
+    withDispatch( ( dispatch ) => {
+        return {
+            onUpdateTerms( terms, restBase ) {
+                dispatch( 'core/editor' ).editPost( { [ restBase ]: terms } );
+            },
+        };
+    } )
 )( WSUFlatTermSelector );
