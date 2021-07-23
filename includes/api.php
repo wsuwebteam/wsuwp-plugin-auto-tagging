@@ -30,7 +30,8 @@ class Api
         add_action('rest_api_init', function () {
             register_rest_route('autotaggingapi/v1', '/terms', array(
                 'methods' => \WP_REST_Server::READABLE,
-                'callback' => array(__CLASS__, 'get_terms')
+                'callback' => array(__CLASS__, 'get_terms'),
+                'permission_callback' => '__return_true' // https://wordpress.org/support/topic/missing-the-required-permission_callback-argument/
             ));
         });
     }
