@@ -10,9 +10,7 @@ function autofillTags( OriginalComponent ) {
         // console.log(wp.data.select("core/editor").getCurrentPostType());
 
         if ( props.slug === 'post_tag' ) {
-            return [
-                <WSUFlatTermSelector {...props} />
-            ];
+            return <WSUFlatTermSelector {...props} />;
         }
 
         // default return

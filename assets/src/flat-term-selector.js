@@ -318,27 +318,29 @@ class WSUFlatTermSelector extends Component {
             singularName
         );
 
-        return [
-            <FormTokenField
-                value={ selectedTerms }
-                suggestions={ termNames }
-                onChange={ this.onChange }
-                onInputChange={ this.searchTerms }
-                maxSuggestions={ MAX_TERMS_SUGGESTIONS }
-                disabled={ loading }
-                label={ newTermLabel }
-                messages={ {
-                    added: termAddedLabel,
-                    removed: termRemovedLabel,
-                    remove: removeTermLabel,
-                } }
-            />,
-            <Button
-                isSmall="true"
-                isPrimary="true"
-                variant="primary"
-                onClick={this.autofillTags}>Autofill Tags</Button>
-        ];
+        return (
+            <>
+                <FormTokenField
+                    value={ selectedTerms }
+                    suggestions={ termNames }
+                    onChange={ this.onChange }
+                    onInputChange={ this.searchTerms }
+                    maxSuggestions={ MAX_TERMS_SUGGESTIONS }
+                    disabled={ loading }
+                    label={ newTermLabel }
+                    messages={ {
+                        added: termAddedLabel,
+                        removed: termRemovedLabel,
+                        remove: removeTermLabel,
+                    } }
+                />
+                <Button
+                    isSmall="true"
+                    isPrimary="true"
+                    variant="primary"
+                    onClick={this.autofillTags}>Autofill Tags</Button>
+            </>
+        );
     }
 }
 
