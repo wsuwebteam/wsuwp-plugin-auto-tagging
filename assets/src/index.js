@@ -1,23 +1,17 @@
 import WSUFlatTermSelector from './flat-term-selector';
 import './style.scss'
 
-const el = wp.element.createElement;
-
 function autofillTags( OriginalComponent ) {
     return function( props ) {
-        // TODO: Only enable on specific post type
-        // console.log(props);
-        // console.log(wp.data.select("core/editor").getCurrentPostType());
+        const supportedPostTypes = ['news_article']; // TODO: implement as WP setting, so users can manage
+        const postType = wp.data.select("core/editor").getCurrentPostType();
 
-        if ( props.slug === 'post_tag' ) {
+        if ( props.slug === 'post_tag' && supportedPostTypes.includes(postType) ) {
             return <WSUFlatTermSelector {...props} />;
         }
 
         // default return
-        return el(
-            OriginalComponent,
-            props
-        );
+        return <OriginalComponent { ...props } />;
     }
 }
 
