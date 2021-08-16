@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: WSUWP Auto-Tagging
+ * Plugin Name: (BETA) WSUWP Auto-Tagging
  * Plugin URI: https://github.com/wsuwebteam/wsuwp-plugin-auto-tagging
  * Description: Auto tag posts
  * Version: 0.0.1
