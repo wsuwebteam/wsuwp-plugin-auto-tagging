@@ -1,0 +1,16 @@
+{
+  "name": "wsuwp-plugin-auto-tagging",
+  "version": "0.0.1",
+  "description": "Auto tag posts",
+  "main": "index.js",
+  "scripts": {
+    "start": "wp-scripts start assets/src/index.js --output-path=assets/dist/ --dev",
+    "build": "wp-scripts build assets/src/index.js --output-path=assets/dist/"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "@wordpress/scripts": "^16.1.0"
+  }
+}
